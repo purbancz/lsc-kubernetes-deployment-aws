@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: content-populator
+spec:
+  template:
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ['sh', '-c', "echo '<h1>LSC Lab5 Kubernetes</h1><p>Well, well, well...</p>' > /mnt/index.html"]
+        volumeMounts:
+        - mountPath: /mnt
+          name: web-content
+      restartPolicy: OnFailure
+      volumes:
+      - name: web-content
+        persistentVolumeClaim:
+          claimName: nfs-pvc

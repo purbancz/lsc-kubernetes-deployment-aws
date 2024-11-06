@@ -1,0 +1,201 @@
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> aws eks create-cluster `
+>>   --name nfs-eks-cluster `
+>>   --region us-east-1 `
+>>   --role-arn arn:aws:iam::637423240254:role/LabRole `
+>>   --resources-vpc-config subnetIds=subnet-006e480015beef182,subnet-0ec6276a49d82f7c9,subnet-0bc509828a0b2926f,subnet-0f5c172da77b1b4a9,subnet-04eaf52627defc331,securityGroupIds=sg-06615c37f24f4e07e
+
+{
+    "cluster": {
+        "name": "nfs-eks-cluster",
+        "arn": "arn:aws:eks:us-east-1:637423240254:cluster/nfs-eks-cluster",
+        "createdAt": "2024-11-05T23:19:38.872000+01:00",
+        "version": "1.31",
+        "roleArn": "arn:aws:iam::637423240254:role/LabRole",
+        "resourcesVpcConfig": {
+            "subnetIds": [
+                "subnet-006e480015beef182",
+                "subnet-0ec6276a49d82f7c9",
+                "subnet-0bc509828a0b2926f",
+                "subnet-0f5c172da77b1b4a9",
+                "subnet-04eaf52627defc331"
+            ],
+            "securityGroupIds": [
+                "sg-06615c37f24f4e07e"
+            ],
+            "vpcId": "vpc-0a6fe77998be24042",
+            "endpointPublicAccess": true,
+            "endpointPrivateAccess": false,
+            "publicAccessCidrs": [
+                "0.0.0.0/0"
+            ]
+        },
+        "kubernetesNetworkConfig": {
+            "serviceIpv4Cidr": "10.100.0.0/16",
+            "ipFamily": "ipv4"
+        },
+        "logging": {
+            "clusterLogging": [
+                {
+                    "types": [
+                        "api",
+                        "audit",
+                        "authenticator",
+                        "controllerManager",
+                        "scheduler"
+                    ],
+                    "enabled": false
+                }
+            ]
+        },
+        "status": "CREATING",
+        "certificateAuthority": {},
+        "platformVersion": "eks.6",
+        "tags": {},
+        "accessConfig": {
+            "bootstrapClusterCreatorAdminPermissions": true,
+            "authenticationMode": "CONFIG_MAP"
+        },
+        "upgradePolicy": {
+            "supportType": "EXTENDED"
+        }
+    }
+}
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> aws eks describe-cluster `
+>>   --name nfs-eks-cluster `
+>>   --region us-east-1 `
+>>   --query "cluster.status"
+"CREATING"
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> aws eks describe-cluster `
+>>   --name nfs-eks-cluster `
+>>   --region us-east-1 `
+>>   --query "cluster.status"
+"ACTIVE"
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> aws eks create-nodegroup `
+>>   --cluster-name nfs-eks-cluster `
+>>   --nodegroup-name nfs-nodes `
+>>   --node-role arn:aws:iam::637423240254:role/LabRole `
+>>   --subnets subnet-006e480015beef182 subnet-0ec6276a49d82f7c9 subnet-0bc509828a0b2926f subnet-0f5c172da77b1b4a9 subnet-04eaf52627defc331 `
+>>   --scaling-config minSize=1,maxSize=3,desiredSize=2 `
+>>   --instance-types t3.medium `
+>>   --region us-east-1
+{
+    "nodegroup": {
+        "nodegroupName": "nfs-nodes",
+        "nodegroupArn": "arn:aws:eks:us-east-1:637423240254:nodegroup/nfs-eks-cluster/nfs-nodes/d0c97f39-79c8-66ce-5d14-c42dcecfdd0d",
+        "clusterName": "nfs-eks-cluster",
+        "version": "1.31",
+        "releaseVersion": "1.31.0-20241024",
+        "createdAt": "2024-11-05T23:30:00.338000+01:00",
+        "modifiedAt": "2024-11-05T23:30:00.338000+01:00",
+        "status": "CREATING",
+        "capacityType": "ON_DEMAND",
+        "scalingConfig": {
+            "minSize": 1,
+            "maxSize": 3,
+            "desiredSize": 2
+        },
+        "instanceTypes": [
+            "t3.medium"
+        ],
+        "subnets": [
+            "subnet-006e480015beef182",
+            "subnet-0ec6276a49d82f7c9",
+            "subnet-0bc509828a0b2926f",
+            "subnet-0f5c172da77b1b4a9",
+            "subnet-04eaf52627defc331"
+        ],
+        "amiType": "AL2023_x86_64_STANDARD",
+        "nodeRole": "arn:aws:iam::637423240254:role/LabRole",
+        "diskSize": 20,
+        "health": {
+            "issues": []
+        },
+        "updateConfig": {
+            "maxUnavailable": 1
+        },
+        "tags": {}
+    }
+}
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> aws eks describe-nodegroup `
+>>   --cluster-name nfs-eks-cluster `
+>>   --nodegroup-name nfs-nodes `
+>>   --region us-east-1 `
+>>   --query "nodegroup.status"
+"CREATING"
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> aws eks describe-nodegroup `
+>>   --cluster-name nfs-eks-cluster `
+>>   --nodegroup-name nfs-nodes `
+>>   --region us-east-1 `
+>>   --query "nodegroup.status"
+"ACTIVE"
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> aws eks --region us-east-1 update-kubeconfig --name nfs-eks-cluster
+Added new context arn:aws:eks:us-east-1:637423240254:cluster/nfs-eks-cluster to C:\Users\URBANCZYKP\.kube\config
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl get nodes
+NAME                            STATUS   ROLES    AGE    VERSION
+ip-172-31-15-205.ec2.internal   Ready    <none>   2m3s   v1.31.0-eks-a737599
+ip-172-31-46-80.ec2.internal    Ready    <none>   2m8s   v1.31.0-eks-a737599
+
+I created a new filesystem (EFS) on AWS manually and had a few attempts to re-install the server using helm. It turned out that I needed to open port 2049 in the security group on the server.
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> helm install nfs-server nfs-provisioner/nfs-subdir-external-provisioner `
+>>   --set storageClass.name=nfs-storage `
+>>   --set storageClass.defaultClass=true `
+>>   --set nfs.server=fs-08403e3f44c4a90a7.efs.us-east-1.amazonaws.com `
+>>   --set nfs.path=/
+NAME: nfs-server
+LAST DEPLOYED: Tue Nov  5 23:50:55 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl get pods
+NAME                                                         READY   STATUS    RESTARTS   AGE
+nfs-server-nfs-subdir-external-provisioner-9b49bd499-bqzj6   1/1     Running   0          5m45s
+
+pvc.yaml
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl apply -f pvc.yaml
+persistentvolumeclaim/nfs-pvc created
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl get pvc
+NAME      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+nfs-pvc   Bound    pvc-d70ff129-c75b-4abc-a1f3-403717584c6a   1Gi        RWX            nfs-storage    <unset>                 28s
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl apply -f nginx-deployment.yaml --validate=false
+deployment.apps/web-server created
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl get deployments
+NAME                                         READY   UP-TO-DATE   AVAILABLE   AGE
+nfs-server-nfs-subdir-external-provisioner   1/1     1            1           14m
+web-server                                   1/1     1            1           83s
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl get pods
+NAME                                                         READY   STATUS    RESTARTS   AGE
+nfs-server-nfs-subdir-external-provisioner-9b49bd499-bqzj6   1/1     Running   0          15m
+web-server-5cdd995865-nrkgz                                  1/1     Running   0          102s
+
+nginx-service.yaml
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl apply -f nginx-service.yaml
+service/web-service created
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl get services
+NAME          TYPE           CLUSTER-IP       EXTERNAL-IP                                                              PORT(S)        AGE
+kubernetes    ClusterIP      10.100.0.1       <none>                                                                   443/TCP        77m
+web-service   LoadBalancer   10.100.119.161   aa5258ea1fe8c44108c62e917f35061c-195270854.us-east-1.elb.amazonaws.com   80:31927/TCP   57s
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl apply -f nginx-job.yaml
+job.batch/content-populator created
+
+PS C:\Users\URBANCZYKP\Documents\studiaAGH\lsc\lab5> kubectl get jobs
+NAME                STATUS     COMPLETIONS   DURATION   AGE
+content-populator   Complete   1/1           4s         2m56s
+
